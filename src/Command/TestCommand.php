@@ -21,15 +21,13 @@ class TestCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $barology = (new Course())->setName('Barology');
-        $bazology = (new Course())->setName('Bazology');
-        $jim = (new Student())->setName('Jim')->addCourse($barology);
-        $bob = (new Student())->setName('Bob')->addCourse($bazology)->addCourse($bazology);
+        $this->em->persist((new Course())->setName('Barology'));
+        $this->em->persist((new Student())->setName('Jim'));
+        $this->em->flush();
 
-        $this->em->persist($barology);
-        $this->em->persist($bazology);
-        $this->em->persist($jim);
-        $this->em->persist($bob);
+        $barology = $this->em->getRepository(Course::class)->findOneByName('Barology');
+        $jim = $this->em->getRepository(Student::class)->findOneByName('Jim');
+        $jim->addCourse($barology);
         $this->em->flush();
 
         return Command::SUCCESS;
